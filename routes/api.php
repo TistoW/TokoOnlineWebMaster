@@ -18,3 +18,4 @@ use Illuminate\Http\Request;
 // });
 
 Route::post('login', 'Api\UserController@login');
+Route::post('register', 'Api\UserController@register');
