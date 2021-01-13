@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\User;
+use App\Produk;
 
 class ProdukController extends Controller
 {
@@ -14,7 +14,7 @@ class ProdukController extends Controller
      */
     public function index()
     {
-        $user['listUser'] = User::all();
+        $user['listUser'] = Produk::all();
         return view('produk')->with($user);
     }
 
@@ -36,7 +36,19 @@ class ProdukController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());die();
+        // dd($request->all());die();
+
+        $fileName = '';
+        if($request->image->getClientOriginalName()){
+            $file = str_replace(' ', '', $request->image->getClientOriginalName());
+            $fileName = date('mYdHs').rand(1,999).'_'.$file;
+            $request->image->storeAs('public/produk', $fileName);
+        }
+
+        $user = Produk::create(array_merge($request->all(), [
+            'image' => $fileName
+        ]));
+        return redirect('produk');
     }
 
     /**
