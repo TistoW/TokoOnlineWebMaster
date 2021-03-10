@@ -21,3 +21,4 @@ Route::post('login', 'Api\UserController@login');
 Route::post('register', 'Api\UserController@register');
 Route::get('produk', 'Api\ProdukController@index');
 Route::post('chekout', 'Api\TransaksiController@store');
+Route::get('chekout/user/{id}', 'Api\TransaksiController@history');

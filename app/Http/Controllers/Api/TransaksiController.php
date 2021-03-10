@@ -18,6 +18,10 @@ class TransaksiController extends Controller
             'total_item' => 'required',
             'total_harga' => 'required',
             'name' => 'required',
+            'jasa_pengiriaman' => 'required',
+            'ongkir' => 'required',
+            'total_transfer' => 'required',
+            'bank' => 'required',
             'phone' => 'required'
         ]);
 
@@ -58,10 +62,33 @@ class TransaksiController extends Controller
             return response()->json([
                 'success' => 1,
                 'message' => 'Transaksi Berhasil',
-                'user' => collect($transaksi)
+                'transaksi' => collect($transaksi)
             ]);
         } else{
             \DB::rollback();
+            $this->error('Transaksi gagal');
+        }
+    }
+
+    public function history($id){
+        $transaksis = Transaksi::with(['user'])->whereHas('user', function ($query) use ($id){
+            $query->whereId($id);
+        })->get();
+
+        foreach ($transaksis as $transaksi){
+            $details = $transaksi->details;
+            foreach ($details as $detail){
+                $detail->produk;
+            }
+        }
+
+        if (!empty($transaksis)){
+            return response()->json([
+                'success' => 1,
+                'message' => 'Transaksi Berhasil',
+                'transaksis' => collect($transaksis)
+            ]);
+        } else{
             $this->error('Transaksi gagal');
         }
     }
