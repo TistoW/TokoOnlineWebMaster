@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Transaksi;
 use App\TransaksiDetail;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
-class TransaksiController extends Controller
-{
-    public function store(Request $requset)
-    {
+class TransaksiController extends Controller {
+    public function store(Request $requset) {
         //nama, email, password
         $validasi = Validator::make($requset->all(), [
             'user_id' => 'required',
@@ -30,8 +29,8 @@ class TransaksiController extends Controller
             return $this->error($val[0]);
         }
 
-        $kode_payment = "INV/PYM/".now()->format('Y-m-d')."/".rand(100, 999);
-        $kode_trx = "INV/PYM/".now()->format('Y-m-d')."/".rand(100, 999);
+        $kode_payment = "INV/PYM/" . now()->format('Y-m-d') . "/" . rand(100, 999);
+        $kode_trx = "INV/PYM/" . now()->format('Y-m-d') . "/" . rand(100, 999);
         $kode_unik = rand(100, 999);
         $status = "MENUNGGU";
         $expired_at = now()->addDay();
@@ -46,7 +45,7 @@ class TransaksiController extends Controller
 
         \DB::beginTransaction();
         $transaksi = Transaksi::create($dataTransaksi);
-        foreach ($requset->produks as $produk){
+        foreach ($requset->produks as $produk) {
             $detail = [
                 'transaksi_id' => $transaksi->id,
                 'produk_id' => $produk['id'],
@@ -57,43 +56,62 @@ class TransaksiController extends Controller
             $transaksiDetail = TransaksiDetail::create($detail);
         }
 
-        if (!empty($transaksi) && !empty($transaksiDetail)){
+        if (!empty($transaksi) && !empty($transaksiDetail)) {
             \DB::commit();
             return response()->json([
                 'success' => 1,
                 'message' => 'Transaksi Berhasil',
                 'transaksi' => collect($transaksi)
             ]);
-        } else{
+        } else {
             \DB::rollback();
-            $this->error('Transaksi gagal');
+            return $this->error('Transaksi gagal');
         }
     }
 
-    public function history($id){
-        $transaksis = Transaksi::with(['user'])->whereHas('user', function ($query) use ($id){
+    public function history($id) {
+        $transaksis = Transaksi::with(['user'])->whereHas('user', function ($query) use ($id) {
             $query->whereId($id);
-        })->get();
+        })->orderBy("id", "desc")->get();
 
-        foreach ($transaksis as $transaksi){
+        foreach ($transaksis as $transaksi) {
             $details = $transaksi->details;
-            foreach ($details as $detail){
+            foreach ($details as $detail) {
                 $detail->produk;
             }
         }
 
-        if (!empty($transaksis)){
+        if (!empty($transaksis)) {
             return response()->json([
                 'success' => 1,
                 'message' => 'Transaksi Berhasil',
                 'transaksis' => collect($transaksis)
             ]);
-        } else{
+        } else {
             $this->error('Transaksi gagal');
         }
     }
 
-    public function error($pasan){
+    public function batal($id){
+        $transaksi = Transaksi::where('id', $id)->first();
+        if ($transaksi){
+            // update data
+
+            $transaksi->update([
+                'status' => "BATAL"
+            ]);
+
+            return response()->json([
+                'success' => 1,
+                'message' => 'Berhasil',
+                'transaksi' => $transaksi
+            ]);
+        } else {
+            return $this->error('Gagal memuat transaksi');
+        }
+    }
+
+    public function error($pasan) {
         return response()->json([
             'success' => 0,
             'message' => $pasan
