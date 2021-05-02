@@ -90,13 +90,22 @@
                                 <td>{{ $data->bank }}</td>
                                 <td>{{ $data->status}}</td>
                                 <td>
-{{--                                    <a href="{{ route('transaksiBatal', $data->id) }}">--}}
-{{--                                        <button type="button" class="btn btn btn-danger btn-xs">Batal</button>--}}
-{{--                                    </a>--}}
-{{--                                    /--}}
-                                    <a href="{{ route('transaksiKirim', $data->id) }}">
-                                        <button type="button" class="btn btn btn-success btn-xs">Kirim</button>
-                                    </a>
+                                    @if($data->status == "DIKIRIM")
+                                        <a href="{{ route('transaksiSelesai', $data->id) }}">
+                                            <button type="button" class="btn btn-block btn-primary btn-xs">Selesai
+                                            </button>
+                                        </a>
+                                    @elseif($data->status == "PROSES")
+                                        <a href="{{ route('transaksiKirim', $data->id) }}">
+                                            <button type="button" class="btn btn-block btn-success btn-xs">Kirim
+                                            </button>
+                                        </a>
+                                    @elseif($data->status == "SELESAI" || $data->status == "BATAL")
+                                        <a href="#">
+                                            <button type="button" class="btn btn-block btn-info btn-xs">Detail
+                                            </button>
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

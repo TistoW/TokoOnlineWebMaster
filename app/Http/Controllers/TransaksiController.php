@@ -39,4 +39,12 @@ class TransaksiController extends Controller {
         ]);
         return redirect('transaksi');
     }
+
+    public function selesai($id){
+        $transaksi = Transaksi::where('id', $id)->first();
+        $transaksi->update([
+            'status' => "SELESAI"
+        ]);
+        return redirect('transaksi');
+    }
 }
