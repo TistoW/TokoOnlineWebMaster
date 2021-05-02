@@ -20,3 +20,8 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('/user', 'UserController');
 Route::resource('/produk', 'ProdukController');
+
+Route::resource('/transaksi', 'TransaksiController');
+Route::get('/transaksi/batal/{id}', 'TransaksiController@batal')->name('transaksiBatal');
+Route::get('/transaksi/confim/{id}', 'TransaksiController@confirm')->name('transaksiConfirm');
+Route::get('/transaksi/kirim/{id}', 'TransaksiController@kirim')->name('transaksiKirim');
