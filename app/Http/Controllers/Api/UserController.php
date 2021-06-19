@@ -14,6 +14,11 @@ class UserController extends Controller
         $user = User::where('email', $requset->email)->first();
 
         if($user){
+
+            $user->update([
+                'fcm' => $requset->fcm
+            ]);
+
             if(password_verify($requset->password, $user->password)){
                 return response()->json([
                     'success' => 1,
